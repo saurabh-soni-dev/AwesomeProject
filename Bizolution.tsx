@@ -12,6 +12,7 @@ import React, {useEffect, useState, useCallback} from 'react';
 
 const Bizolution = () => {
   const API_URL = 'https://api.restful-api.dev/objects';
+  const [originalList, setOriginalList] = useState([]);
   const [list, setList] = useState([]);
   const [searchItem, setSearchItem] = useState('');
   const [loading, setLoading] = useState(false);
@@ -26,6 +27,7 @@ const Bizolution = () => {
     try {
       const response = await fetch(API_URL);
       const data = await response.json();
+      setOriginalList(data);
       setList(data);
     } catch (error) {
       console.error(error);
@@ -35,14 +37,18 @@ const Bizolution = () => {
   };
 
   const handleSearch = useCallback(
-    value => {
+    (value: string) => {
       setSearchItem(value);
-      const filteredList = list.filter(item =>
-        item.name.toLowerCase().includes(value.toLowerCase()),
-      );
-      setList(filteredList);
+      if (value === '') {
+        setList(originalList);
+      } else {
+        const filteredList = originalList.filter(item =>
+          item.name.toLowerCase().includes(value.toLowerCase()),
+        );
+        setList(filteredList);
+      }
     },
-    [list],
+    [originalList],
   );
 
   const handleRefresh = useCallback(() => {
